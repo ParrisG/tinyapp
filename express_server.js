@@ -45,6 +45,13 @@ app.get("/urls", (req, res) => {
   res.render("urls_index", templateVars);
 });
 
+// Creating the POST route to remove a URL resource
+app.post("/urls/:shortURL/delete", (req, res) => {
+  delete urlDatabase[req.params.shortURL];
+  res.redirect("/urls");
+});
+
+
 // Adding a new Tiny URL
 // Creating the form for the new url submission
 app.get("/urls/new", (req, res) => {
@@ -56,9 +63,9 @@ app.post("/urls", (req, res) => {
   urlDatabase[shortURL] = req.body.longURL;
   
   res.redirect(`/urls/${shortURL}`);
-
-
 });
+
+
 
 
 app.get("/urls/:shortURL", (req, res) => {

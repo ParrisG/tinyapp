@@ -9,6 +9,8 @@ const urlDatabase = {
   "9sm5xK": "http://www.google.com"
 };
 
+
+//ROUTE HANDLERS
 app.get("/", (req, res) => {
   res.send("Hello!");
 });
@@ -26,6 +28,7 @@ app.get("/set", (req, res) => {
   res.send(`a = ${a}`);
 });
 
+//REMOVE??? This code may just have been for example.
 app.get("/fetch", (req, res) => {
   res.send(`a = ${a}`);
 });
@@ -35,6 +38,16 @@ app.get("/urls", (req, res) => {
   res.render("urls_index", templateVars);
 });
 
+app.get("/urls/:shortURL", (req, res) => {
+  const shortURL = req.params.shortURL;
+  const longURL = urlDatabase[shortURL];
+  const templateVars = { shortURL, longURL };
+  res.render("urls_show", templateVars);
+})
+
+
+
+// Start the app listening
 app.listen(PORT, () => {
   console.log(`Example app listening on port ${PORT}!`);
 });

@@ -81,6 +81,13 @@ app.get("/u/:shortURL", (req, res) => {
   res.redirect(longURL);
 });
 
+// Providing the ability to Update a record
+app.post("/urls/:shortURL", (req, res) => {
+  const newLongURL = req.body.longURL;
+  urlDatabase[req.params.shortURL] = newLongURL;
+  res.redirect("/urls");
+})
+
 // Start the app listening
 app.listen(PORT, () => {
   console.log(`Example app listening on port ${PORT}!`);

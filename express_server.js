@@ -52,19 +52,27 @@ app.get("/urls/new", (req, res) => {
 });
 // Posting the information from the form
 app.post("/urls", (req, res) => {
-  console.log(req.body);
-  res.send("Ok");
+  const shortURL = generateRandomString();
+  urlDatabase[shortURL] = req.body.longURL;
+  
+  res.redirect(`/urls/${shortURL}`);
+
+
 });
 
 
-app.get("/urls/:id", (req, res) => {
-  const shortURL = req.params.id;
+app.get("/urls/:shortURL", (req, res) => {
+  const shortURL = req.params.shortURL;
   const longURL = urlDatabase[shortURL];
   const templateVars = { shortURL, longURL };
   res.render("urls_show", templateVars);
 });
 
-
+// Provide a way for users to enter their TinyURL and have it redirect to the original long URL
+app.get("/u/:shortURL", (req, res) => {
+  const longURL = urlDatabase[req.params.shortURL];
+  res.redirect(longURL);
+});
 
 // Start the app listening
 app.listen(PORT, () => {

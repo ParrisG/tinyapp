@@ -61,9 +61,10 @@ app.get("/fetch", (req, res) => {
 });
 
 app.get("/urls", (req, res) => {
+  const user = users[req.cookies["user_id"]];
   const templateVars = {
     urls: urlDatabase,
-    username: req.cookies["username"]
+    user
   };
   res.render("urls_index", templateVars);
 });
@@ -78,8 +79,9 @@ app.post("/urls/:shortURL/delete", (req, res) => {
 // Adding a new Tiny URL
 // Creating the form for the new url submission
 app.get("/urls/new", (req, res) => {
+  const user = users[req.cookies["user_id"]];
   const templateVars = { 
-    username: req.cookies["username"]
+    user
   };
   res.render("urls_new", templateVars);
 });
@@ -95,12 +97,13 @@ app.post("/urls", (req, res) => {
 
 
 app.get("/urls/:shortURL", (req, res) => {
+  const user = users[req.cookies["user_id"]];
   const shortURL = req.params.shortURL;
   const longURL = urlDatabase[shortURL];
   const templateVars = {
     shortURL,
     longURL,
-    username: req.cookies["username"]
+    user
   };
   res.render("urls_show", templateVars);
 });
@@ -136,21 +139,27 @@ app.get("/register", (req, res) => {
   res.render("regForm");
 });
 
-// Endpoing to POST /register: actually adding user info to users (db)
+// Endpoint to POST /register: actually adding user info to users (db)
 app.post("/register", (req, res) => {
   // Extract the data from the request
   const email = req.body.email;
   const password = req.body.password;
 
-  console.log("email: ", email);
-  console.log("password: ", password);
+
+  // Check to make sure neither email nor password are empty strings
+  if (email === "" || password === "") {
+    res.status(400);
+    res.send("Error (400): email and password fields cannot be empty.")
+    return;
+  }
 
   // Check to make sure the user doesn't already exist
 
   for (let user in users) {
     // Error if the user already exists
     if (users[user].email === email) {
-      res.send("Email already Exists!")
+      res.status(400);
+      res.send("Error (400): Email already exists!")
       return;
     }
   }
@@ -165,10 +174,6 @@ app.post("/register", (req, res) => {
   };
   users[UserId] = UserInfo;
   
-  console.log(UserInfo);
-  console.log(users);
-
-
   // log-in the user by assigning a cookie
   res.cookie("user_id", users[UserId].id);
 

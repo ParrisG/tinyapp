@@ -119,6 +119,12 @@ app.post("/urls/:shortURL", (req, res) => {
   const newLongURL = req.body.longURL;
   urlDatabase[req.params.shortURL] = newLongURL;
   res.redirect("/urls");
+});
+
+// Handling the Login functionality
+// Endpoint for the user to login (GET "/login")
+app.get("/login", (req, res) => {
+  res.render("login");
 })
 
 // Endpoint for the user to signin. Setting a cookie named username.

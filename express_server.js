@@ -138,7 +138,7 @@ app.post("/login", (req, res) => {
 
 // Endpoint for the user to signout. Clears the username cookie.
 app.post("/logout", (req, res) => {
-  res.clearCookie('username');
+  res.clearCookie('user_id');
   res.redirect("/urls");
 });
 // Handling REGISTRATION related endpoints

@@ -8,9 +8,27 @@ app.set('view engine', "ejs");
 app.use(bodyParser.urlencoded({extended: true}));
 app.use(cookieParser());
 
+
+//Helper Functions
 function generateRandomString() {
   return Math.random().toString(36).slice(2, 8);
 }
+
+//"Database" objects for use in the project
+
+const users = {
+  "userRandomID": {
+    id: "userRandomID", 
+    email: "user@example.com", 
+    password: "purple-monkey-dinosaur"
+  },
+ "user2RandomID": {
+    id: "user2RandomID", 
+    email: "user2@example.com", 
+    password: "dishwasher-funk"
+  }
+}
+
 
 const urlDatabase = {
   "b2xVn2": "http://www.lighthouselabs.ca",
@@ -112,11 +130,51 @@ app.post("/logout", (req, res) => {
   res.clearCookie('username');
   res.redirect("/urls");
 });
-
+// Handling REGISTRATION related endpoints
 // Endpoint to GET /register
 app.get("/register", (req, res) => {
   res.render("regForm");
 });
+
+// Endpoing to POST /register: actually adding user info to users (db)
+app.post("/register", (req, res) => {
+  // Extract the data from the request
+  const email = req.body.email;
+  const password = req.body.password;
+
+  console.log("email: ", email);
+  console.log("password: ", password);
+
+  // Check to make sure the user doesn't already exist
+
+  for (let user in users) {
+    // Error if the user already exists
+    if (users[user].email === email) {
+      res.send("Email already Exists!")
+      return;
+    }
+  }
+  // Create a unique id for the user record
+  const UserId = generateRandomString();
+  
+  // Add the user's info to the users database object
+  const UserInfo = {
+    id: UserId,
+    email,
+    password
+  };
+  users[UserId] = UserInfo;
+  
+  console.log(UserInfo);
+  console.log(users);
+
+
+  // log-in the user by assigning a cookie
+  res.cookie("user_id", users[UserId].id);
+
+  // redirect the user to /urls
+  res.redirect("/urls");
+})
 
 // Start the app listening
 app.listen(PORT, () => {

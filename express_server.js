@@ -111,7 +111,12 @@ app.post("/login", (req, res) => {
 app.post("/logout", (req, res) => {
   res.clearCookie('username');
   res.redirect("/urls");
-})
+});
+
+// Endpoint to GET /register
+app.get("/register", (req, res) => {
+  res.render("regForm");
+});
 
 // Start the app listening
 app.listen(PORT, () => {

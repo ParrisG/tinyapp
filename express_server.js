@@ -107,6 +107,12 @@ app.post("/login", (req, res) => {
   res.redirect("/urls");
 });
 
+// Endpoint for the user to signout. Clears the username cookie.
+app.post("/logout", (req, res) => {
+  res.clearCookie('username');
+  res.redirect("/urls");
+})
+
 // Start the app listening
 app.listen(PORT, () => {
   console.log(`Example app listening on port ${PORT}!`);

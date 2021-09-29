@@ -90,6 +90,13 @@ app.post("/urls/:shortURL", (req, res) => {
   res.redirect("/urls");
 })
 
+// Endpoint for the user to signin. Setting a cookie named username.
+app.post("/login", (req, res) => {
+  const usernameFromForm = req.body.username;
+  res.cookie('username', usernameFromForm);
+  res.redirect("/urls");
+});
+
 // Start the app listening
 app.listen(PORT, () => {
   console.log(`Example app listening on port ${PORT}!`);

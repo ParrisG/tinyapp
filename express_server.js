@@ -124,7 +124,9 @@ app.post("/urls/:shortURL", (req, res) => {
 // Handling the Login functionality
 // Endpoint for the user to login (GET "/login")
 app.get("/login", (req, res) => {
-  res.render("login");
+  const user = users[req.cookies["user_id"]];
+  const templateVars = { user };
+  res.render("login", templateVars);
 })
 
 // Endpoint for the user to signin. Setting a cookie named username.
@@ -142,7 +144,9 @@ app.post("/logout", (req, res) => {
 // Handling REGISTRATION related endpoints
 // Endpoint to GET /register
 app.get("/register", (req, res) => {
-  res.render("regForm");
+  const user = users[req.cookies["user_id"]];
+  const templateVars = { user };
+  res.render("regForm", templateVars);
 });
 
 // Endpoint to POST /register: actually adding user info to users (db)

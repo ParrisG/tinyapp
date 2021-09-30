@@ -2,13 +2,18 @@ const express = require("express");
 const app = express();
 const PORT = 8080;
 const bodyParser = require("body-parser");
-const cookieParser = require("cookie-parser");
+//const cookieParser = require("cookie-parser");
+const cookieSession = require("cookie-session");
 const bcrypt = require('bcryptjs');
 const salt = bcrypt.genSaltSync(10);
 
 app.set('view engine', "ejs");
 app.use(express.urlencoded({extended: true}));
-app.use(cookieParser());
+//app.use(cookieParser());
+app.use(cookieSession({
+  name: 'session',
+  keys: ["This is a key for my project", "This is a second key and is really cool!"]
+}));
 
 
 //Helper Functions
@@ -82,7 +87,7 @@ app.get("/hello", (req, res) => {
 });
 
 app.get("/urls", (req, res) => {
-  const user = users[req.cookies["user_id"]];
+  const user = users[req.session.user_id];
   if (!user) {
     res.redirect("/login");
     return;
@@ -97,7 +102,7 @@ app.get("/urls", (req, res) => {
 
 // Creating the POST route to remove a URL resource
 app.post("/urls/:shortURL/delete", (req, res) => {
-  const user = users[req.cookies["user_id"]];
+  const user = users[req.session.user_id];
   const shortURL = req.params.shortURL;
   // ensuring user is logged in and owns the url in order to be able to delete it. 
   // send an error message if not logged in
@@ -121,7 +126,7 @@ app.post("/urls/:shortURL/delete", (req, res) => {
 // Adding a new TinyURL
 // Creating the form for the new url submission
 app.get("/urls/new", (req, res) => {
-  const user = users[req.cookies["user_id"]];
+  const user = users[req.session.user_id];
   const templateVars = {
     user
   };
@@ -136,7 +141,7 @@ app.get("/urls/new", (req, res) => {
 // Posting the information from the form and creating the new TinyURL
 app.post("/urls", (req, res) => {
   // if user is not logged in, they cannot post here
-  const user = users[req.cookies["user_id"]];
+  const user = users[req.session.user_id];
   if (!user) {
     res.send("Error: User must be logged in to POST.");
     return;
@@ -154,7 +159,7 @@ app.post("/urls", (req, res) => {
 
 
 app.get("/urls/:shortURL", (req, res) => {
-  const user = users[req.cookies["user_id"]];
+  const user = users[req.session.user_id];
   const shortURL = req.params.shortURL;
   // send an error message if not logged in
   if (!user) {
@@ -197,7 +202,7 @@ app.post("/urls/:shortURL", (req, res) => {
 // Handling the Login functionality
 // Endpoint for the user to login (GET "/login")
 app.get("/login", (req, res) => {
-  const user = users[req.cookies["user_id"]];
+  const user = users[req.session.user_id];
   const templateVars = { user };
   // if the user is already logged in, redirect to /urls
   if (user) {
@@ -226,8 +231,8 @@ app.post("/login", (req, res) => {
     res.send("Error (403): Incorrect Password.");
     return;
   }
-  // if everything is good to go, log user in by setting user_id cookie
-  res.cookie('user_id', user.id);
+  // if everything is good to go, log user in by setting session cookie with the user.id value
+  req.session.user_id = user.id;
   res.redirect('/urls');
 });
 
@@ -240,7 +245,7 @@ app.post("/logout", (req, res) => {
 // Handling REGISTRATION related endpoints
 // Endpoint to GET /register
 app.get("/register", (req, res) => {
-  const user = users[req.cookies["user_id"]];
+  const user = users[req.session.user_id];
   const templateVars = { user };
   // if the user is already logged in, redirect to /urls
   if (user) {
@@ -287,9 +292,9 @@ app.post("/register", (req, res) => {
   };
   users[UserId] = UserInfo;
   
-  // log-in the user by assigning a cookie
-  res.cookie("user_id", users[UserId].id);
-
+  // log-in the user by assigning a session cookie
+  req.session.user_id = users[UserId].id;
+ 
   // redirect the user to /urls
   res.redirect("/urls");
 });

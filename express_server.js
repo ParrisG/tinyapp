@@ -77,17 +77,29 @@ app.post("/urls/:shortURL/delete", (req, res) => {
 });
 
 
-// Adding a new Tiny URL
+// Adding a new TinyURL
 // Creating the form for the new url submission
 app.get("/urls/new", (req, res) => {
   const user = users[req.cookies["user_id"]];
   const templateVars = {
     user
   };
+  // if user is not logged in redirect to login page
+  if (!user) {
+    res.redirect("/login");
+    return;
+  }
   res.render("urls_new", templateVars);
 });
-// Posting the information from the form
+
+// Posting the information from the form and creating the new TinyURL
 app.post("/urls", (req, res) => {
+  // if user is not logged in, they cannot post here
+  const user = users[req.cookies["user_id"]];
+  if (!user) {
+    res.send("Error: User must be logged in to POST.");
+    return;
+  }
   const shortURL = generateRandomString();
   urlDatabase[shortURL] = req.body.longURL;
   

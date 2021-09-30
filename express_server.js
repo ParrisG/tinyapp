@@ -95,6 +95,22 @@ app.get("/urls", (req, res) => {
 
 // Creating the POST route to remove a URL resource
 app.post("/urls/:shortURL/delete", (req, res) => {
+  const user = users[req.cookies["user_id"]];
+  const shortURL = req.params.shortURL;
+  // ensuring user is logged in and owns the url in order to be able to delete it. 
+  // send an error message if not logged in
+  if (!user) {
+    res.send("Error: You must be logged in to view this content.");
+    return;
+  }
+  // deny access if trying to delete a TinyURL not owned by the user
+  const urlsForUser = filterUrlDatabaseByUser(user.id, urlDatabase);
+  if (!urlsForUser[shortURL]) {
+    res.send("Error: You don't own this TinyURL. You cannot update it.");
+    return;
+  }
+
+   
   delete urlDatabase[req.params.shortURL];
   res.redirect("/urls");
 });
@@ -140,13 +156,14 @@ app.get("/urls/:shortURL", (req, res) => {
   const shortURL = req.params.shortURL;
   // send an error message if not logged in
   if (!user) {
-    res.send("Error: You must be logged in to view this content.")
+    res.send("Error: You must be logged in to view this content.");
     return;
   }
   // deny access if trying to acces a TinyURL not owned by the user
   const urlsForUser = filterUrlDatabaseByUser(user.id, urlDatabase);
   if (!urlsForUser[shortURL]) {
-    res.send("Error: You don't own this TinyURL. You cannot update it.")
+    res.send("Error: You don't own this TinyURL. You cannot update it.");
+    return;
   }
 
   const longURL = urlDatabase[shortURL].longURL;

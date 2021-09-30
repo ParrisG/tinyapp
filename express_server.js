@@ -143,9 +143,26 @@ app.get("/login", (req, res) => {
 
 // Endpoint for the user to signin. Setting a cookie named username.
 app.post("/login", (req, res) => {
-  const usernameFromForm = req.body.username;
-  res.cookie('username', usernameFromForm);
-  res.redirect("/urls");
+  const email = req.body.email;
+  const password = req.body.password;
+  // this function returns the user object if present in users database, false otherwise.
+  const user = findUserByEmail(email, users);
+
+  // if user not found return error code
+  if (user === false) {
+    res.status(403);
+    res.send("Error (403): User email not found.");
+    return;
+  }
+  // if passwords don't match
+  if (user.password !== password) {
+    res.status(403);
+    res.send("Error (403): Incorrect Password.");
+    return;
+  }
+  // if everything is good to go, log user in by setting user_id cookie
+  res.cookie('user_id', user.id);
+  res.redirect('/urls');
 });
 
 // Endpoint for the user to signout. Clears the username cookie.

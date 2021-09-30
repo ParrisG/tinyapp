@@ -19,7 +19,7 @@ function generateRandomString() {
 //This function checks to see if a provided email is in the users db. It returns the entire user object if found, or false.
 const findUserByEmail = (email, users) => { 
   for (let user in users) {
-    if (users[user].email === email) {
+    if (users[user].email.toLowerCase() === email.toLowerCase()) {
       return users[user];
     }
   }
@@ -141,7 +141,7 @@ app.get("/login", (req, res) => {
   res.render("login", templateVars);
 })
 
-// Endpoint for the user to signin. Setting a cookie named username.
+// Endpoint for the user to signin.
 app.post("/login", (req, res) => {
   const email = req.body.email;
   const password = req.body.password;
@@ -154,7 +154,7 @@ app.post("/login", (req, res) => {
     res.send("Error (403): User email not found.");
     return;
   }
-  // if passwords don't match
+  // if passwords don't match return error code
   if (user.password !== password) {
     res.status(403);
     res.send("Error (403): Incorrect Password.");
@@ -165,11 +165,12 @@ app.post("/login", (req, res) => {
   res.redirect('/urls');
 });
 
-// Endpoint for the user to signout. Clears the username cookie.
+// Endpoint for the user to signout. Clears the user_id cookie.
 app.post("/logout", (req, res) => {
   res.clearCookie('user_id');
   res.redirect("/urls");
 });
+
 // Handling REGISTRATION related endpoints
 // Endpoint to GET /register
 app.get("/register", (req, res) => {

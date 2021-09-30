@@ -43,8 +43,14 @@ const users = {
 
 
 const urlDatabase = {
-  "b2xVn2": "http://www.lighthouselabs.ca",
-  "9sm5xK": "http://www.google.com"
+  b6UTxQ: {
+    longURL: "https://www.tsn.ca",
+    userID: "aJ48lW"
+  },
+  i3BoGr: {
+    longURL: "https://www.google.ca",
+    userID: "aJ48lW"
+  }
 };
 
 
@@ -101,8 +107,10 @@ app.post("/urls", (req, res) => {
     return;
   }
   const shortURL = generateRandomString();
-  urlDatabase[shortURL] = req.body.longURL;
-  
+  urlDatabase[shortURL] = { 
+    longURL: req.body.longURL,
+    userID: user.id
+  }
   res.redirect(`/urls/${shortURL}`);
 });
 
@@ -112,7 +120,7 @@ app.post("/urls", (req, res) => {
 app.get("/urls/:shortURL", (req, res) => {
   const user = users[req.cookies["user_id"]];
   const shortURL = req.params.shortURL;
-  const longURL = urlDatabase[shortURL];
+  const longURL = urlDatabase[shortURL].longURL;
   const templateVars = {
     shortURL,
     longURL,
@@ -123,14 +131,13 @@ app.get("/urls/:shortURL", (req, res) => {
 
 // Provide a way for users to enter their TinyURL and have it redirect to the original long URL
 app.get("/u/:shortURL", (req, res) => {
-  const longURL = urlDatabase[req.params.shortURL];
-  res.redirect(longURL);
+  res.redirect(urlDatabase[req.params.shortURL].longURL);
 });
 
 // Providing the ability to Update a record
 app.post("/urls/:shortURL", (req, res) => {
   const newLongURL = req.body.longURL;
-  urlDatabase[req.params.shortURL] = newLongURL;
+  urlDatabase[req.params.shortURL].longURL = newLongURL;
   res.redirect("/urls");
 });
 

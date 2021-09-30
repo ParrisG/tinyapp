@@ -27,14 +27,13 @@ const findUserByEmail = (email, users) => {
 };
 
 //This function loops through the urlDatabase and returns all the records (as a new db type object) belonging to a specific user.
-const filterUrlDatabaseByUser = (user_id, urlDatabase) => {
+const filterUrlDatabaseByUser = (user_id, database) => {
   const ownedUrlDatabase = {};
-  for (let record in urlDatabase) {
-    if (urlDatabase[record].userID === user_id) {
-      ownedUrlDatabase[record] = urlDatabase[record];
+  for (let record in database) {
+    if (database[record].userID === user_id) {
+      ownedUrlDatabase[record] = database[record];
     }
   }
-  console.log(ownedUrlDatabase);
   return ownedUrlDatabase;
   
 }
@@ -82,9 +81,13 @@ app.get("/hello", (req, res) => {
 
 app.get("/urls", (req, res) => {
   const user = users[req.cookies["user_id"]];
-  filterUrlDatabaseByUser("aJ48lW", urlDatabase); //TESTING/////////////////////////////
+  if (!user) {
+    res.redirect("/login");
+    return;
+  }
+  const urlsForUser = filterUrlDatabaseByUser(user.id, urlDatabase);
   const templateVars = {
-    urls: urlDatabase,
+    urls: urlsForUser,
     user
   };
   res.render("urls_index", templateVars);
@@ -126,6 +129,7 @@ app.post("/urls", (req, res) => {
     userID: user.id
   }
   res.redirect(`/urls/${shortURL}`);
+
 });
 
 
@@ -134,6 +138,17 @@ app.post("/urls", (req, res) => {
 app.get("/urls/:shortURL", (req, res) => {
   const user = users[req.cookies["user_id"]];
   const shortURL = req.params.shortURL;
+  // send an error message if not logged in
+  if (!user) {
+    res.send("Error: You must be logged in to view this content.")
+    return;
+  }
+  // deny access if trying to acces a TinyURL not owned by the user
+  const urlsForUser = filterUrlDatabaseByUser(user.id, urlDatabase);
+  if (!urlsForUser[shortURL]) {
+    res.send("Error: You don't own this TinyURL. You cannot update it.")
+  }
+
   const longURL = urlDatabase[shortURL].longURL;
   const templateVars = {
     shortURL,
@@ -147,6 +162,7 @@ app.get("/urls/:shortURL", (req, res) => {
 app.get("/u/:shortURL", (req, res) => {
   if (urlDatabase[req.params.shortURL]) {
     res.redirect(urlDatabase[req.params.shortURL].longURL);
+    
   } else {
     res.send("Error: TinyURL as entered doesn't exist.");
   }

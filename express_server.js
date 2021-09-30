@@ -131,7 +131,11 @@ app.get("/urls/:shortURL", (req, res) => {
 
 // Provide a way for users to enter their TinyURL and have it redirect to the original long URL
 app.get("/u/:shortURL", (req, res) => {
-  res.redirect(urlDatabase[req.params.shortURL].longURL);
+  if (urlDatabase[req.params.shortURL]) {
+    res.redirect(urlDatabase[req.params.shortURL].longURL);
+  } else {
+    res.send("Error: TinyURL as entered doesn't exist.");
+  }
 });
 
 // Providing the ability to Update a record

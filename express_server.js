@@ -12,12 +12,12 @@ app.use(cookieParser());
 //Helper Functions
 
 //This function produces a random string (used for creating unique Ids)
-function generateRandomString() {
+const generateRandomString = () => {
   return Math.random().toString(36).slice(2, 8);
-}
+};
 
 //This function checks to see if a provided email is in the users db. It returns the entire user object if found, or false.
-const findUserByEmail = (email, users) => { 
+const findUserByEmail = (email, users) => {
   for (let user in users) {
     if (users[user].email.toLowerCase() === email.toLowerCase()) {
       return users[user];
@@ -30,16 +30,16 @@ const findUserByEmail = (email, users) => {
 
 const users = {
   "userRandomID": {
-    id: "userRandomID", 
-    email: "user@example.com", 
+    id: "userRandomID",
+    email: "user@example.com",
     password: "purple-monkey-dinosaur"
   },
- "user2RandomID": {
-    id: "user2RandomID", 
-    email: "user2@example.com", 
+  "user2RandomID": {
+    id: "user2RandomID",
+    email: "user2@example.com",
     password: "dishwasher-funk"
   }
-}
+};
 
 
 const urlDatabase = {
@@ -59,17 +59,6 @@ app.get("/urls.json", (req, res) => {
 
 app.get("/hello", (req, res) => {
   res.send("<html><body>Hello <b>World</b></body></html>\n");
-});
-
-//REMOVE??? This specific code block may just have been for example.
-app.get("/set", (req, res) => {
-  const a = 1;
-  res.send(`a = ${a}`);
-});
-
-//REMOVE??? This specific code block may just have been for example.
-app.get("/fetch", (req, res) => {
-  res.send(`a = ${a}`);
 });
 
 app.get("/urls", (req, res) => {
@@ -92,7 +81,7 @@ app.post("/urls/:shortURL/delete", (req, res) => {
 // Creating the form for the new url submission
 app.get("/urls/new", (req, res) => {
   const user = users[req.cookies["user_id"]];
-  const templateVars = { 
+  const templateVars = {
     user
   };
   res.render("urls_new", templateVars);
@@ -138,8 +127,13 @@ app.post("/urls/:shortURL", (req, res) => {
 app.get("/login", (req, res) => {
   const user = users[req.cookies["user_id"]];
   const templateVars = { user };
-  res.render("login", templateVars);
-})
+  // if the user is already logged in, redirect to /urls
+  if (user) {
+    res.redirect('/urls');
+  } else {
+    res.render("login", templateVars);
+  }
+});
 
 // Endpoint for the user to signin.
 app.post("/login", (req, res) => {
@@ -176,7 +170,12 @@ app.post("/logout", (req, res) => {
 app.get("/register", (req, res) => {
   const user = users[req.cookies["user_id"]];
   const templateVars = { user };
-  res.render("regForm", templateVars);
+  // if the user is already logged in, redirect to /urls
+  if (user) {
+    res.redirect('/urls');
+  } else {
+    res.render("regForm", templateVars);
+  }
 });
 
 // Endpoint to POST /register: actually adding user info to users (db)
@@ -189,7 +188,7 @@ app.post("/register", (req, res) => {
   // Check to make sure neither email nor password are empty strings
   if (email === "" || password === "") {
     res.status(400);
-    res.send("Error (400): email and password fields cannot be empty.")
+    res.send("Error (400): email and password fields cannot be empty.");
     return;
   }
 
@@ -200,7 +199,7 @@ app.post("/register", (req, res) => {
   // Error if the user already exists
   if (user) {
     res.status(400);
-    res.send("Error (400): Email already exists!")
+    res.send("Error (400): Email already exists!");
     return;
   }
   
@@ -220,7 +219,7 @@ app.post("/register", (req, res) => {
 
   // redirect the user to /urls
   res.redirect("/urls");
-})
+});
 
 // Start the app listening
 app.listen(PORT, () => {

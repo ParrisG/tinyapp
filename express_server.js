@@ -10,9 +10,21 @@ app.use(cookieParser());
 
 
 //Helper Functions
+
+//This function produces a random string (used for creating unique Ids)
 function generateRandomString() {
   return Math.random().toString(36).slice(2, 8);
 }
+
+//This function checks to see if a provided email is in the users db. It returns the entire user object if found, or false.
+const findUserByEmail = (email, users) => { 
+  for (let user in users) {
+    if (users[user].email === email) {
+      return users[user];
+    }
+  }
+  return false;
+};
 
 //"Database" objects for use in the project
 
@@ -164,15 +176,16 @@ app.post("/register", (req, res) => {
   }
 
   // Check to make sure the user doesn't already exist
+  // This function returns the user object if found, or false if not found
+  const user = findUserByEmail(email, users);
 
-  for (let user in users) {
-    // Error if the user already exists
-    if (users[user].email === email) {
-      res.status(400);
-      res.send("Error (400): Email already exists!")
-      return;
-    }
+  // Error if the user already exists
+  if (user) {
+    res.status(400);
+    res.send("Error (400): Email already exists!")
+    return;
   }
+  
   // Create a unique id for the user record
   const UserId = generateRandomString();
   

@@ -26,6 +26,19 @@ const findUserByEmail = (email, users) => {
   return false;
 };
 
+//This function loops through the urlDatabase and returns all the records (as a new db type object) belonging to a specific user.
+const filterUrlDatabaseByUser = (user_id, urlDatabase) => {
+  const ownedUrlDatabase = {};
+  for (let record in urlDatabase) {
+    if (urlDatabase[record].userID === user_id) {
+      ownedUrlDatabase[record] = urlDatabase[record];
+    }
+  }
+  console.log(ownedUrlDatabase);
+  return ownedUrlDatabase;
+  
+}
+
 //"Database" objects for use in the project
 
 const users = {
@@ -69,6 +82,7 @@ app.get("/hello", (req, res) => {
 
 app.get("/urls", (req, res) => {
   const user = users[req.cookies["user_id"]];
+  filterUrlDatabaseByUser("aJ48lW", urlDatabase); //TESTING/////////////////////////////
   const templateVars = {
     urls: urlDatabase,
     user

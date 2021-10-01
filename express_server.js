@@ -43,7 +43,12 @@ const urlDatabase = {
 
 //ROUTE HANDLERS
 app.get("/", (req, res) => {
-  res.send("Hello!");
+  const user = users[req.session.user_id];
+  //if user logged in direct to /urls, else direct to /login
+  if (user) {
+    return res.redirect("/urls");
+  }
+  res.redirect("/login");
 });
 
 app.get("/urls.json", (req, res) => {

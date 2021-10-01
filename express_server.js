@@ -54,7 +54,7 @@ app.get("/", (req, res) => {
 app.get("/urls", (req, res) => {
   const user = users[req.session.user_id];
   if (!user) {
-    res.redirect("/login");
+    res.send("Error: You must be logged in to view this content.");
     return;
   }
   const urlsForUser = filterUrlDatabaseByUser(user.id, urlDatabase);
@@ -89,7 +89,7 @@ app.post("/urls/:shortURL/delete", (req, res) => {
 
 
 // Adding a new TinyURL
-// Creating the form for the new url submission
+// URLS/NEW 
 app.get("/urls/new", (req, res) => {
   const user = users[req.session.user_id];
   const templateVars = {
@@ -131,6 +131,12 @@ app.get("/urls/:shortURL", (req, res) => {
     res.send("Error: You must be logged in to view this content.");
     return;
   }
+  // send an error message if the given ID doesn't exist
+  if (!urlDatabase.hasOwnProperty(shortURL)) {
+    res.send("Error: The provided TinyURL does not exist");
+    return;
+  }
+
   // deny access if trying to acces a TinyURL not owned by the user
   const urlsForUser = filterUrlDatabaseByUser(user.id, urlDatabase);
   if (!urlsForUser[shortURL]) {

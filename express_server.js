@@ -8,7 +8,7 @@ const salt = bcrypt.genSaltSync(10);
 const { generateRandomString, findUserByEmail, filterUrlDatabaseByUser } = require("./helpers");
 
 app.set('view engine', "ejs");
-app.use(express.urlencoded({extended: true}));
+app.use(bodyParser.urlencoded({extended: true}));
 app.use(cookieSession({
   name: 'session',
   keys: ["This is a key for my project", "This is a second key and is really cool!"]
@@ -72,7 +72,7 @@ app.get("/urls", (req, res) => {
 app.post("/urls/:shortURL/delete", (req, res) => {
   const user = users[req.session.user_id];
   const shortURL = req.params.shortURL;
-  // ensuring user is logged in and owns the url in order to be able to delete it. 
+  // ensuring user is logged in and owns the url in order to be able to delete it.
   // send an error message if not logged in
   if (!user) {
     res.send("Error: You must be logged in to view this content.");
@@ -115,10 +115,10 @@ app.post("/urls", (req, res) => {
     return;
   }
   const shortURL = generateRandomString();
-  urlDatabase[shortURL] = { 
+  urlDatabase[shortURL] = {
     longURL: req.body.longURL,
     userID: user.id
-  }
+  };
   res.redirect(`/urls/${shortURL}`);
 
 });

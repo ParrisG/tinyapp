@@ -16,15 +16,15 @@ const findUserByEmail = (email, users) => {
 };
 
 //This function loops through the urlDatabase and returns all the records (as a new db type object) belonging to a specific user.
-const filterUrlDatabaseByUser = (user_id, database) => {
+const filterUrlDatabaseByUser = (userId, database) => {
   const ownedUrlDatabase = {};
   for (let record in database) {
-    if (database[record].userID === user_id) {
+    if (database[record].userID === userId) {
       ownedUrlDatabase[record] = database[record];
     }
   }
   return ownedUrlDatabase;
   
-}
+};
 
 module.exports = { generateRandomString, findUserByEmail, filterUrlDatabaseByUser };

@@ -51,14 +51,6 @@ app.get("/", (req, res) => {
   res.redirect("/login");
 });
 
-app.get("/urls.json", (req, res) => {
-  res.json(urlDatabase);
-});
-
-app.get("/hello", (req, res) => {
-  res.send("<html><body>Hello <b>World</b></body></html>\n");
-});
-
 app.get("/urls", (req, res) => {
   const user = users[req.session.user_id];
   if (!user) {

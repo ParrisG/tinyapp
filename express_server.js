@@ -14,7 +14,7 @@ app.use(cookieSession({
   keys: ["This is a key for my project", "This is a second key and is really cool!"]
 }));
 
-
+// These are the data structures used in the project in place of true databases. I have left the example "database" entries active for now in case they are neccessary for Lighthouse Labs' project testing and evaluation purposes.
 const users = {
   "userRandomID": {
     id: "userRandomID",
@@ -42,6 +42,8 @@ const urlDatabase = {
 
 
 //ROUTE HANDLERS
+
+// "/"
 app.get("/", (req, res) => {
   const user = users[req.session.user_id];
   //if user logged in direct to /urls, else direct to /login
@@ -51,6 +53,8 @@ app.get("/", (req, res) => {
   res.redirect("/login");
 });
 
+
+// "/URLS"
 app.get("/urls", (req, res) => {
   const user = users[req.session.user_id];
   if (!user) {
@@ -65,7 +69,8 @@ app.get("/urls", (req, res) => {
   res.render("urls_index", templateVars);
 });
 
-// Creating the POST route to remove a URL resource
+
+// DELETE - Creating the POST route to remove a URL resource
 app.post("/urls/:shortURL/delete", (req, res) => {
   const user = users[req.session.user_id];
   const shortURL = req.params.shortURL;
@@ -81,15 +86,12 @@ app.post("/urls/:shortURL/delete", (req, res) => {
     res.send("Error: You don't own this TinyURL. You cannot update it.");
     return;
   }
-
-   
   delete urlDatabase[req.params.shortURL];
   res.redirect("/urls");
 });
 
 
-// Adding a new TinyURL
-// URLS/NEW 
+// URLS/NEW - adding a new TinyURL
 app.get("/urls/new", (req, res) => {
   const user = users[req.session.user_id];
   const templateVars = {
@@ -117,12 +119,10 @@ app.post("/urls", (req, res) => {
     userID: user.id
   };
   res.redirect(`/urls/${shortURL}`);
-
 });
 
 
-
-
+// "/URLS/SHORTURL" 
 app.get("/urls/:shortURL", (req, res) => {
   const user = users[req.session.user_id];
   const shortURL = req.params.shortURL;
@@ -136,7 +136,6 @@ app.get("/urls/:shortURL", (req, res) => {
     res.send("Error: The provided TinyURL does not exist");
     return;
   }
-
   // deny access if trying to acces a TinyURL not owned by the user
   const urlsForUser = filterUrlDatabaseByUser(user.id, urlDatabase);
   if (!urlsForUser[shortURL]) {
@@ -153,7 +152,8 @@ app.get("/urls/:shortURL", (req, res) => {
   res.render("urls_show", templateVars);
 });
 
-// Provide a way for users to enter their TinyURL and have it redirect to the original long URL
+
+// "/U/SHORTURL" - Provide a way for users to enter their TinyURL and have it redirect to the original long URL
 app.get("/u/:shortURL", (req, res) => {
   if (urlDatabase[req.params.shortURL]) {
     res.redirect(urlDatabase[req.params.shortURL].longURL);
@@ -163,12 +163,14 @@ app.get("/u/:shortURL", (req, res) => {
   }
 });
 
+
 // Providing the ability to Update a record
 app.post("/urls/:shortURL", (req, res) => {
   const newLongURL = req.body.longURL;
   urlDatabase[req.params.shortURL].longURL = newLongURL;
   res.redirect("/urls");
 });
+
 
 // Handling the Login functionality
 // Endpoint for the user to login (GET "/login")
@@ -234,14 +236,12 @@ app.post("/register", (req, res) => {
   const password = req.body.password;
   const hashedPassword = bcrypt.hashSync(req.body.password, salt);
 
-
   // Check to make sure neither email nor password are empty strings
   if (email === "" || password === "") {
     res.status(400);
     res.send("Error (400): email and/or password fields cannot be empty.");
     return;
   }
-
   // Check to make sure the user doesn't already exist
   // This function returns the user object if found, or false if not found
   const user = findUserByEmail(email, users);
